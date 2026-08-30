@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+supabase
+youtube-transcript-api
+groq
+google-genai
