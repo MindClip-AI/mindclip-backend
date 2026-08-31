@@ -4,3 +4,4 @@ supabase
 youtube-transcript-api
 groq
 google-genai
+python-dotenv
