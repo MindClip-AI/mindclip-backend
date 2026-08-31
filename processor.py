@@ -3,7 +3,7 @@
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
-from utils.youtube import extract_youtube_id
+from utils.youtube import extract_youtube_id, get_transcript
 
 load_dotenv()
 
@@ -34,6 +34,25 @@ def process_pending_videos() -> None:
     for record in records:
         youtube_id = extract_youtube_id(record["source_url"])
         print(f"Procesando ID Contenido: {record['id']} | YouTube ID: {youtube_id}")
+
+        transcript_text = get_transcript(youtube_id) if youtube_id else None
+
+        if transcript_text:
+            (
+                supabase.table('contents')
+                .update({'transcript': transcript_text})
+                .eq('id', record['id'])
+                .execute()
+            )
+            print(f"Transcripción guardada para {record['id']} (Longitud: {len(transcript_text)} caracteres)")
+        else:
+            (
+                supabase.table('contents')
+                .update({'status': 'failed'})
+                .eq('id', record['id'])
+                .execute()
+            )
+            print(f"Error: No se pudo obtener transcripción para {record['id']}. Marcat como 'failed'")
 
 
 if __name__ == "__main__":
